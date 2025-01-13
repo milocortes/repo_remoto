@@ -1,0 +1,203 @@
+---
+title: "Script3"
+author: "Yosune Miquelajauregui"
+date: "14/12/2017"
+output: word_document
+---
+
+#Script de la tercera clase de estadística y modelación de sistemas socioecológicos en R.
+
+#Familia apply y graficación
+
+Introducción al uso de funciones apply()
+```{r Generar datos, eval=TRUE}
+x <- matrix(rnorm(30,0.5,0.5), nrow=5, ncol=6)
+head(x)
+```
+
+Obtener la suma y el promedio para cada columna y renglón
+```{r obtener la suma y el promedio para cada columna y renglón, eval=TRUE}
+apply(x,2,sum) ## suma de columnas
+apply(x,1,sum) ## suma de renglones
+apply(x,1,mean) ## promedio de renglones
+apply(x,2,mean) ## promedio de columnas
+```
+
+Podemos crear una función y evaluarla dentro del apply()
+```{r aplicar otra función, eval=TRUE}
+apply (x,1,function(x) x/2)
+primerafuncion <- function (x){
+     x <- x*5
+     x
+  }
+apply (x,2,primerafuncion)
+```
+
+Utilizar los datos implementados en R
+```{r datos iris, eval=TRUE}
+attach(iris)
+head(iris)
+```
+
+Utilizar tapply() sobre una hoja de datos para una variable determinada dada por un factor. El resultado es un vector. Obtener la media del ancho de los pétalos por especie.
+```{r tapply media, eval=TRUE}
+tapply(iris$Petal.Width,iris$Species, mean)
+```
+
+Obtener la suma del ancho de los pétalos por especie.
+```{r tapply suma, eval=TRUE}
+tapply(iris$Petal.Width,iris$Species, sum)
+```
+
+Se utiliza lapply() cuando se quiere evaluar una función en una lista. El resultado es también una lista.
+```{r aplicar lapply, eval=TRUE}
+c1 <- data.frame (1,1:10)
+c2 <- data.frame (1, 20:30)
+mi.lista <- list (c1, c2)
+lapply (mi.lista, sum)
+```
+
+Se utiliza sapply() cuando se quiere evaluar una función en una lista. El resultado es un vector.
+```{r aplicar sapply, eval=TRUE}
+sapply (mi.lista, sum)
+```
+
+# Bestiario de gráficas
+
+1. Histograma: se utiliza para visualizar la distribución de una variable numérica
+```{r histograma, eval=TRUE}
+Incendio<-read.table("Fire_intensity.txt", header = T) 
+Incendio <- na.omit(Incendio) 
+hist(Incendio$Fire.intensity,main = "Histograma sin transformación",xlab = "Intensidad del incendio (kW/m)")
+Incendio$logFire.intensity <-
+  log(Incendio$Fire.intensity)
+hist(Incendio$logFire.intensity, xlab = "Intensidad del incendio (log)", main = "Histograma con transformación")
+```
+
+2. Barras: se utiliza para graficar frecuencias, medias,desviación estándar.
+```{r barras, eval=TRUE}
+carros <- mtcars[c(1,2,6,10)]
+names(carros)<- c("eficiencia","cilindros","peso","velocidades")
+str(carros)
+conteo <- table(carros$velocidades)
+barplot(conteo,names.arg=c("3 vel","4 vel","5 vel"),xlab="Número de velocidades",ylab="Número de carros") # barras verticales
+barplot(conteo,	ylab="Número de velocidades",xlab="Número de carros", horiz=TRUE,names.arg=c("3 vel","4 vel","5 vel")) # barras horizontales
+```
+
+3. Barras apiladas
+```{r barras apiladas, eval=TRUE}
+conteo2 <- table(carros$velocidades,carros$cilindros)
+barplot(conteo2, main="Cilindros y velocidades"
+, xlab="Cilindros",ylab= "Número de carros",col=c("red","blue","green"),
+legend=rownames(conteo2))
+
+barplot(conteo2, main="Cilindros y velocidades"
+, xlab="Cilindros",ylab="Número de carros",col=c("red","blue","green"),legend = rownames(conteo2),beside=TRUE)
+```
+
+4. Usar la función aggregate() para obtener medias y otras métricas para una o más variables numéricas y graficar con barplot()
+```{r agregar, eval=TRUE}
+aggdatos <- aggregate(carros$eficiencia,by=list(carros$cilindros),FUN=mean, na.rm=TRUE)
+names(aggdatos) <- c("Cilindros","Eficiencia")
+
+barplot(aggdatos$Eficiencia, ylab= "Eficiencia promedio (mpg)",xlab="Cilindros", names.arg=aggdatos$Cilindros, ylim=c(0,30))
+```
+
+5. Gráfico de dispersión x-y plot()
+```{r dispersion, eval=TRUE}
+plot(carros$peso, carros$eficiencia,
+  	xlab="Peso (libras) ", ylab="Eficiencia (mpg) ", pch=19)
+```
+
+6. Añadir línea de ajuste y~x
+```{r ajuste, eval=TRUE}
+plot(carros$peso, carros$eficiencia,
+  	xlab="Peso (libras) ", ylab="Eficiencia (mpg) ", pch=19)
+abline(lm(carros$eficiencia~carros$peso), col="red")
+```
+
+7. Grafica de lineas
+```{r lineas, eval=TRUE}
+ModeloResultados <- read.csv(file="ModeloPezVela.csv", header=T)
+Años <- seq(1,100)# crear secuencia
+plot(Años,ModeloResultados[,1],type="l", col="red", ylim = c(9000,26000), ylab = "Población de pez vela")
+lines(Años,ModeloResultados[,2],type="l", col="orange")
+lines(Años,ModeloResultados[,3],type="l", col="yellow")
+lines(Años,ModeloResultados[,4],type="l", col="green")
+lines(Años,ModeloResultados[,5],type="l", col="blue")
+abline(h = 17000)
+legend(10,27000, c("8500","5000","3500","3000","100"), horiz=TRUE,bty="n",
+lty=1,lwd=2,col=c("red","orange","yellow","green","blue"))
+```
+
+8. Obtener medias con colMeans() y/o apply(), calcular desviaciones estándar y graficar
+```{r medias, eval=TRUE}
+names(ModeloResultados)<- c("8500","5000","3500","3000","100")
+###función para graficar desviación estándar
+error.bar <- function(x, y, upper, lower=upper, length=0.1,...){
+if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper))
+stop("vectors must be same length")
+arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length, ...)
+}
+###Calcular medias
+medias <- colMeans(ModeloResultados)
+ymedia <- apply(ModeloResultados,2,mean)
+ed.y <- apply(ModeloResultados,2,sd)
+barx <- barplot(ymedia,col=c("red","orange","yellow","green","blue"), xlab="Número de turistas", ylab="Individuos de marlin")
+error.bar(barx,ymedia, 1.96*ed.y/10)
+```
+
+9.Para hacer gráficas en ggplot los datos deben estar estructurados como hoja de datos y en formato "largo" en vez de "ancho".
+```{r estructura ggplot, eval=TRUE}
+#formato "largo"
+#crear nueva variable "Escenario"
+E <- c("8500","5000","3500","3000","100")
+E2 <- rep(E, each=100)
+E8500 <- ModeloResultados[,1]
+E5000 <- ModeloResultados[,2]
+E3500 <- ModeloResultados[,3]
+E3000 <- ModeloResultados[,4]
+E100  <- ModeloResultados[,5]
+DataE <- c (E8500,E5000,E3500,E3000,E100)
+Data <- as.data.frame(E2)
+Data$Poblacion <- DataE
+names(Data)<- c("Escenario","Poblacion")
+Data$Escenario <- as.factor(Data$Escenario)
+Data$Poblacion <- as.numeric(Data$Poblacion)
+```
+
+Función para calcular media, des. estandar, intervalos de confianza
+```{r estadisticas, eval=TRUE}
+summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
+conf.interval=.95, .drop=TRUE) {
+library(plyr)
+  length2 <- function (x, na.rm=FALSE) {
+  if (na.rm) sum(!is.na(x))
+    else length(x)
+    }
+
+datac <- ddply(data, groupvars, .drop=.drop,
+.fun = function(xx, col) {
+c(N= length2(xx[[col]], na.rm=na.rm),
+mean = mean (xx[[col]], na.rm=na.rm),
+sd   = sd (xx[[col]], na.rm=na.rm))
+  },measurevar)
+
+datac <- rename(datac, c("mean" = measurevar))
+datac$se <- datac$sd / sqrt(datac$N)  
+ciMult <- qt(conf.interval/2 + .5, datac$N-1)
+datac$ci <- datac$se * ciMult
+return(datac)
+}
+```
+
+Gráfico con 95% intervalos de confianza 
+```{r grafico, eval=TRUE}
+library(ggplot2)
+resumen <- summarySE(Data, measurevar="Poblacion", groupvars=c("Escenario"))
+resumen
+grafica <- ggplot(resumen, aes(x=Escenario, y=Poblacion))  
+grafica2 <- grafica+ geom_bar(position=position_dodge(),stat="identity") 
+grafica3 <- grafica2+ geom_errorbar(aes(ymin=Poblacion-ci, ymax=Poblacion+ci),width=.2,         position=position_dodge(.9))
+grafica3
+```

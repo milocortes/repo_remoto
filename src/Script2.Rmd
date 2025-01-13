@@ -1,0 +1,166 @@
+---
+title: "Script2"
+author: "Yosune Miquelajauregui"
+date: "14/12/2017"
+output: word_document
+---
+#Script de la segunda clase de estadística y modelación de sistemas socioecológicos en R.
+
+#Generación de datos, bucles y funciones
+
+Uso de las funciones seq() y rep()
+```{r generar datos, eval=TRUE}
+Años <- seq (1:1000)
+str(Años)
+
+tmp <- seq(1, 20, by = 3) 
+tmp
+
+tmp2 <- seq(0, 1, length.out=10 ) 
+tmp2
+```
+Generación de factores. Uso de c() y rep()
+```{r generar factores, eval=TRUE}
+Municipio <- c("Tlahuac", "Tlalpan","Miguel Hidalgo", "Cuauhtemoc", "Venustiano Carranza", "Coyoacan", "Benito Juarez", "Cuajimalpa","Magdalena Contreras", "Xochimilco","Azcapotzalco", "Gustavo A. Madero", "Iztacalco","Iztapalapa", "Milpa Alta", "Alvaro Obregon")
+Mu <- rep(Municipio,each=8)
+str(Mu)
+```
+
+Uso de rep()
+```{r repeticiones, eval=TRUE}
+rep(1:20) 
+rep(1:20, each = 2) 
+```
+Generar datos aleatorios 
+```{r generar datos aleatorios, eval=TRUE}
+Datosaleatoriosnormal <- rnorm(1000,0.5,0.5)
+Datosaleatoriosbinom <- rbinom (50, 50,0.5)
+Datosaleatoriospoi <- rpois(1000,0.8)
+str(Datosaleatoriosnormal)
+str(Datosaleatoriosbinom)
+str(Datosaleatoriospoi) 
+```
+
+#Bucles
+
+Generar bucles "for"
+```{r primer bucle for, eval=TRUE}
+tmp <- seq(30,1000,by=2)
+rc <- numeric(length(tmp))
+for (i in 1:length(tmp)){
+rc[i] <- sqrt(tmp[i])  
+rc
+}
+head(rc)
+```
+
+```{r segundo bucle for, eval=TRUE}
+m <- 20
+n <- 0
+for (k in 1:length(m)){
+n[k] <- m*2/4
+n
+}
+n
+```
+
+```{r tercer bucle for, eval=TRUE}
+PoblacionBallenas <- seq (1200,2000,by=100)
+NuevaPoblacion <- numeric(length(PoblacionBallenas))
+Nacimientos <- 2
+
+for (b in 1:length(PoblacionBallenas)){
+  NuevaPoblacion[b] <- PoblacionBallenas [b] + Nacimientos
+  NuevaPoblacion
+}
+head(PoblacionBallenas)
+head(NuevaPoblacion)
+```
+
+```{r cuarto bucle for, eval=TRUE}
+PoblacionBallenas <- seq (1200,2000,by=100)
+CambioPob <- numeric(length(PoblacionBallenas)-1)
+
+for (b in 1:length(PoblacionBallenas)-1){
+  CambioPob[b] <- PoblacionBallenas [b+1] - PoblacionBallenas [b] 
+  CambioPob
+}
+CambioPob
+```
+
+Generar bucles "while"
+```{r primer bucle while, eval=TRUE}
+i <- 1
+while (i < 6) {
+  print(i)
+  i = i+1
+}
+```
+
+```{r segundo bucle while, eval=TRUE}
+numero <- 1
+while (numero <5){
+  print("este número es menor que cinco")
+numero <- numero+1
+}
+```
+
+Generar bucles "repeat"
+```{r primer bucle repeat, eval=TRUE}
+x <- 1
+repeat {
+  print(x)
+  x = x+1
+  if (x == 6){
+    break
+  }
+}
+```
+
+#Funciones
+
+```{r primera función, eval=TRUE}
+primerafuncion <- function (x){
+     x <- x*5
+     x
+}
+```
+
+```{r segunda función, eval=TRUE}
+ segundafuncion <- function (x, y){
+   tmp <- x*y
+   tmp
+ }
+```
+ 
+```{r tercera función, eval=TRUE} 
+ tercerafuncion <- function (x){
+  tmp1 <- mean(x[,1])
+  tmp2 <- mean(x[,2])
+  tmp3 <- mean(x[,3])
+  return (c(tmp1,tmp2,tmp3))
+ }
+```
+
+Evaluar las funciones
+```{r evaluar funciones, eval=TRUE} 
+primerafuncion(5)
+primerafuncion(8)
+primerafuncion(1000)
+segundafuncion(3,3)
+segundafuncion(1000,3)
+segundafuncion(8789,8768)
+Var1 <- seq(0, 1, length.out=100) 
+Var2 <- seq(20, 700, length.out=100)  
+Var3 <-seq(103, 305, length.out=100) 
+Datos3<- cbind(Var1,Var2, Var3)
+head(Datos3)
+str(Datos3)
+tercerafuncion(Datos3)
+```
+
+Podemos guardar las funciones como objetos en R para tener acceso a ellas en cualquier momento.
+```{r guardar funciones, eval=TRUE} 
+save(segundafuncion,file="segundafuncion.Rdata")
+load(file="segundafuncion.Rdata")
+```

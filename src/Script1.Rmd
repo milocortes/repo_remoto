@@ -1,0 +1,200 @@
+---
+title: "Script1"
+author: "Yosune Miquelajauregui"
+date: "13/12/2017"
+output: word_document
+---
+
+#Script de la primera clase de estadística y modelación de sistemas socioecológicos en R.
+
+#Introducción a R
+
+```{r operaciones simples, eval=TRUE}
+##suma##
+3+2
+##restas##
+5-2
+##multiplicaciones##
+6*3
+##divisiones##
+6/3
+```
+
+Cualquier operación puede ser asignada a un objeto que queda guardado en la memoria de la sesión de R. Existen varios tipos de objetos
+```{r objetos, eval=TRUE}
+##constantes##
+a <- 6*3
+a
+##vectores##
+b <- c(1,4,8,16)
+b
+##Hojas de datos##
+c1 <- data.frame(1,1:10)
+c1
+c2 <- data.frame (1, 20:30)
+##matrices##
+m <- matrix (1:4,2,2)
+m
+##listas##
+mi.lista <- list(c1, c2) 
+mi.lista
+```
+
+Podemos realizar operaciones entre los objetos
+```{r operaciones entre objetos, eval=TRUE}
+##multiplicaciones##
+b <- c(1,4,8,16)
+xx <- c(2,3,4,5)
+bporxx <- b*xx
+bporxx
+b1 <- b*a 
+b1
+##multiplicacion de matrices##
+m1 <- matrix (1:4,2,2)
+m2 <- matrix (5:8,2,2)
+m3 <- m1%*%m2
+m3
+##divisiones##
+bxx<-b/xx
+bxx
+b3 <- b/a
+b3
+##sustracciones##
+b2 <- b-a
+b2
+##adiciones## 
+b4 <- b+a
+b4
+```
+
+Acceder a los elementos de los objetos
+```{r acceder a elementos, eval=TRUE}
+b[c(3,1,4)]##los elementos 3, 1 y 4 del vector b
+c1 <- data.frame(1,1:10)
+c1[,1]  ## la primera columna de la hoja de datos c1
+c1[,2] ## la segunda columna de la hoja de datos c1
+c1[1,]  ## el primer renglón de la hoja de datos c1 
+c1[2:5,] ##los renglones 2 al 5 de la hoja de datos c1
+c2 <- data.frame (1, 20:30)
+mi.lista <- list(c1, c2) 
+mi.lista[[2]] ## la segunda lista del objeto mi.lista
+
+```
+
+Podemos modificar los elementos de los objetos
+```{r modificar atributos, eval=TRUE}
+b
+b[1] <- 5 ##cambiar el elemento 1 del vector b a 5
+b
+##Añadir y eliminar numeros##
+b[4] <- 0.001
+b
+b[5:10] <- c(18:21,30:31)
+b
+b <- b[-10]
+b
+b <- b[c(-9,-6)]
+b
+##Crear nuevas variables basados en los elementos de otra variable##
+c1[,3]<- c1[,2]/7
+head(c1)
+```
+
+Existen funciones implementadas en R
+```{r funciones implementadas en R, eval=TRUE}
+##obtener el largo del objeto##
+length(a)
+length(b)
+length(c1[,2])
+length(c1)
+##la estructura del objeto##
+str(a)
+str(b)
+str(c1)
+str(mi.lista)
+##tipo de objeto##
+is.numeric(b)
+is.factor(b)
+bf<- as.factor(b)
+bf <- as.numeric(bf)
+##asignar nombres a las columnas de una hoja de datos##
+colnames(c1)<- c('Individuo','Orden',"Tasa")
+head(c1)
+##buscar ayuda en R##
+floor(a)
+help(floor)
+```
+
+Unir elementos de dos o más hojas de datos y matrices 
+```{r unir elementos en R, eval=TRUE}
+ m1 <- matrix (1:4,2,2)
+ m2 <- matrix (5:8,2,2)
+ m3<- cbind (m1,m2)
+ m4<- rbind (m1,m2)
+ m5 <- merge(m1,m2,all = TRUE)
+``` 
+
+Establecer directorio de trabajo
+```{r establecer directorio de trabajo, eval=TRUE}
+##verificar directorio  de trabajo##
+getwd()
+##lista de objectos guardados en la memoria##
+ls() 
+##cambiar directorio de trababajo##
+setwd("~/Desktop/ClaseEstadisticaModelacion")
+```
+
+Importar y exportar datos
+```{r importar y exportar datos, eval=TRUE}
+Incendio<-read.table("Fire_intensity.txt", header = T) ##dar la dirección que apunte al archivo en su computadora
+#write.csv (Incendio,file="C:\\Users\\Usuario\\Documents\\CursoR\\incendios.csv”) 
+```
+
+Ver atributos de la base de datos
+```{r base de datos, eval=TRUE}
+head(Incendio)
+str(Incendio)
+length(Incendio[1,])##columnas
+length(Incendio[,1])##renglones
+names(Incendio)
+```
+
+```{r manipulación de la base de datos, eval=TRUE}
+##remover NAs##
+Incendio <- na.omit(Incendio) 
+##rango de una variable en particular##
+range(Incendio$Fire.intensity)
+##convertir la variable Stand.id a factor##
+Incendio$Stand<-as.factor(Incendio$Stand.id)
+str(Incendio)
+##eliminar los negativos##
+Incendio <- Incendio[- which(Incendio$Probability.mortality < 0),] 
+##Remover valores de intensidad mayores a 1000 kW/m##
+Incendio2 <- Incendio[ which(Incendio$Fire.intensity < 1000),] 
+range(Incendio2$Fire.intensity)
+##Concatenar Region and Stand.id##
+Incendio$Region_Plot <- paste(Incendio$Region, Incendio$Stand.id, sep ="_" )
+head(Incendio2)
+```
+
+Crear un subconjunto de datos basado en dos atributos utilizando la función which ()
+```{r subconjunto de datos utilizando operadores and y or, eval=TRUE}
+nuevosdatos <- Incendio[ which(Incendio$Fire.intensity<1500 
+                               & Incendio$Stand.age == "Young"),] ## operador and
+
+nuevosdatos2 <- Incendio[ which(Incendio$Fire.intensity<1500 
+                                | Incendio$Stand.age == "Young"),] ## operador or
+```
+
+Utilizar la función ifelse para crear una nueva variable "Tipo de incendio" basada en la intensidad del incendio (kW/m): superficial de baja intensidad SBI<200; superficial alta intensidad SAI >=200 y <1500; corona alta intensidad >1500 CAI
+```{r crear nueva variable basada en niveles de otra variable, eval=TRUE}
+Incendio$TipoIncendio <- ifelse(Incendio$Fire.intensity<200,"SBI",ifelse
+                           (Incendio$Fire.intensity>=200 & Incendio$Fire.intensity<1500,"SAI","CAI"))
+Incendio$TipoIncendio<-as.factor(Incendio$TipoIncendio)
+str(Incendio)
+```
+
+Utilizar la funcion subsset para elegir entradas basadas en otras atributos
+```{r subset, eval=TRUE}
+nuevosdatos <- subset(Incendio, TipoIncendio == "SBI",select=c(Probability.mortality,TipoIncendio))
+```                      

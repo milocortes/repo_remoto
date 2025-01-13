@@ -1,7 +1,12 @@
-# repo_remoto
+# Clase de estadística en R
 
-Este es el README.md de mi respositorio remoto.
+Este repositorio contiene los programas de R usados durante el curso.
 
-Nuevo cambio.
+Pronto un libro colaborativo.
 
-Nuevo cambio.
+## Uso de los programas
+
+Los programas están en la carpeta src.
+
+![](doc/rstudio.jpeg)
+
